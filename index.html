@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>苗豆 · 独立开发者 — 把想法做成能玩的东西</title>
+<meta name="description" content="苗豆（qiangsi）的个人作品集：像素游戏、教育项目与自托管工具。零依赖、零构建、一定发布。">
+<meta name="theme-color" content="#0B0D0F">
+<meta property="og:title" content="苗豆 · 独立开发者">
+<meta property="og:description" content="像素游戏、教育项目与自托管工具。想到 → 做完 → 发布。">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0d0f'/%3E%3Ctext x='7' y='23' font-family='monospace' font-size='18' fill='%2334c77b'%3E%26gt;_%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ 设计令牌（复刻 bashcat.net 终端风） ============ */
+:root{
+  --term-bg:#0b0d0f;--term-bg-elev:#111417;--term-bg-soft:#15191d;
+  --term-line:#1e2328;--term-line-soft:#181c21;
+  --term-ink:#e3e7ea;--term-ink-dim:#99a2aa;--term-ink-mute:#6b747c;
+  --term-accent:#34c77b;--term-accent-hover:#4ad48d;
+  --term-accent-soft:#34c77b1a;--term-accent-line:#34c77b52;
+  --term-mono:"JetBrains Mono","IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --term-sans:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --term-fs-h1:clamp(40px,5vw,64px);
+  --term-fs-h2:clamp(28px,3vw,40px);
+  --term-fs-h3:20px;--term-fs-body:16px;--term-fs-small:14px;--term-fs-label:12px;
+  --term-r-xs:4px;--term-r-sm:6px;--term-r-md:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--term-bg);color:var(--term-ink);font-family:var(--term-sans);font-size:var(--term-fs-body);line-height:1.65;font-feature-settings:"palt" 1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh}
+::selection{background:var(--term-accent);color:var(--term-bg)}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-weight:inherit;color:inherit;letter-spacing:normal}
+img{max-width:100%}
+section{scroll-margin-top:76px}
+.container{max-width:1280px;margin:0 auto;padding:0 32px}
+.mono{font-family:var(--term-mono);letter-spacing:0}
+.display{font-weight:600;letter-spacing:-.02em}
+.accent{color:var(--term-accent)}
+.muted{color:var(--term-ink-dim)}
+.dim{color:var(--term-ink-mute)}
+.eyebrow{font-size:var(--term-fs-label);font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--term-ink-dim);display:inline-flex;align-items:center;gap:8px}
+.status-dot{display:inline-block;width:6px;height:6px;background:var(--term-accent);border-radius:50%}
+
+/* 按钮 */
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:var(--term-fs-small);font-weight:500;padding:10px 18px;border:1px solid var(--term-line);background:transparent;color:var(--term-ink);cursor:pointer;transition:background-color .18s ease,border-color .18s ease,color .18s ease;border-radius:var(--term-r-sm);white-space:nowrap;line-height:1.2}
+.btn:hover{border-color:var(--term-ink-mute);background:var(--term-bg-elev)}
+.btn--primary{background:var(--term-accent);color:var(--term-bg)!important;border-color:var(--term-accent);font-weight:600}
+.btn--primary:hover{background:var(--term-accent-hover);border-color:var(--term-accent-hover);color:var(--term-bg)}
+.more-link{font-size:var(--term-fs-small);font-weight:500;color:var(--term-accent);border-bottom:1px solid transparent;transition:border-color .18s ease}
+.more-link:hover{border-bottom-color:var(--term-accent)}
+
+/* 面板 / 窗口 */
+.panel{border:1px solid var(--term-line);background:var(--term-bg-elev);border-radius:var(--term-r-sm)}
+.win{border:1px solid var(--term-line);background:var(--term-bg-elev);border-radius:var(--term-r-sm);overflow:hidden}
+.win__bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--term-line);font-size:var(--term-fs-label);font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--term-ink-dim);background:var(--term-bg-soft)}
+.win__dots{display:flex;gap:6px}
+.win__dot{width:8px;height:8px;border-radius:50%;background:var(--term-line)}
+.win__dot--g{background:var(--term-ink-mute)}
+.win__title{margin-left:8px;font-family:var(--term-mono);text-transform:none;letter-spacing:0}
+.win__body{padding:22px;font-family:var(--term-mono);font-size:13px;line-height:1.9}
+.win__body .cmd{color:var(--term-ink)}
+.win__body .prompt{color:var(--term-ink-mute)}
+.win__body .out{color:var(--term-ink-dim)}
+.win__body .ok{color:var(--term-accent)}
+.cursor{display:inline-block;width:8px;height:15px;background:var(--term-accent);vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* 药丸 */
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:var(--term-fs-label);font-weight:500;padding:5px 12px;border:1px solid var(--term-line);border-radius:100px;color:var(--term-ink-dim);letter-spacing:.04em}
+.pill__dot{width:6px;height:6px;border-radius:50%;background:var(--term-accent)}
+
+/* 顶栏 */
+.header{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--term-line);background:#0b0d0fe0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.header__in{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{font-family:var(--term-mono);font-weight:700;font-size:15px;letter-spacing:.02em}
+.brand .accent{font-weight:700}
+.nav{display:flex;align-items:center;gap:28px}
+.nav a{font-size:var(--term-fs-small);color:var(--term-ink-dim);transition:color .18s}
+.nav a:hover{color:var(--term-ink)}
+
+/* Hero */
+.hero{padding:96px 0 64px}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.hero h1{font-size:var(--term-fs-h1);line-height:1.12;margin:20px 0 22px}
+.hero .lede{color:var(--term-ink-dim);font-size:clamp(16px,1.4vw,18px);max-width:34em;margin-bottom:30px}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:18px}
+.hero-pill{margin-left:4px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--term-line);border:1px solid var(--term-line);border-radius:var(--term-r-sm);overflow:hidden;margin-top:56px}
+.hero-stats>div{background:var(--term-bg-elev);padding:18px 20px}
+.hero-stats .num{font-family:var(--term-mono);font-size:22px;font-weight:600;color:var(--term-ink)}
+.hero-stats .lbl{font-size:var(--term-fs-label);text-transform:uppercase;letter-spacing:.08em;color:var(--term-ink-mute);margin-top:4px}
+
+/* 区块 */
+.section{padding:104px 0 0}
+.section-head{margin-bottom:40px}
+.section-head h2{font-size:var(--term-fs-h2);line-height:1.2;margin-top:14px}
+
+/* 三步卡 */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.how-grid .panel{padding:28px 26px;transition:border-color .2s ease}
+.how-grid .panel:hover{border-color:var(--term-ink-mute)}
+.step-num{font-family:var(--term-mono);font-size:13px;color:var(--term-accent);font-weight:600}
+.how-grid h3{font-size:var(--term-fs-h3);font-weight:600;letter-spacing:-.01em;margin:14px 0 8px}
+.how-grid p{color:var(--term-ink-dim);font-size:var(--term-fs-small);line-height:1.7}
+
+/* 项目卡 */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat-grid .panel{padding:28px 26px;display:flex;flex-direction:column;gap:0;transition:border-color .2s ease,transform .2s ease}
+.feat-grid .panel:hover{border-color:var(--term-ink-mute);transform:translateY(-2px)}
+.feat-top{display:flex;align-items:center;justify-content:space-between}
+.feat-tag{font-family:var(--term-mono);font-size:11px;color:var(--term-ink-mute)}
+.feat-grid h3{font-size:var(--term-fs-h3);font-weight:600;letter-spacing:-.01em;margin:16px 0 4px}
+.feat-grid p{color:var(--term-ink-dim);font-size:var(--term-fs-small);line-height:1.7;margin-top:8px;flex:1}
+.feat-links{display:flex;gap:16px;margin-top:18px;align-items:center}
+
+/* 全部仓库 */
+.folio{border:1px solid var(--term-line);border-radius:var(--term-r-sm);overflow:hidden;background:var(--term-bg-elev)}
+.folio-row{display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:baseline;padding:16px 22px;border-bottom:1px solid var(--term-line-soft);transition:background-color .2s}
+.folio-row:last-child{border-bottom:0}
+.folio-row:hover{background:var(--term-bg-soft)}
+.folio-year{font-family:var(--term-mono);font-size:12px;color:var(--term-ink-mute)}
+.folio-name{font-weight:600;font-size:15px}
+.folio-name .mono{font-size:13px;color:var(--term-ink-mute);font-weight:400;margin-left:8px}
+.folio-desc{color:var(--term-ink-dim);font-size:var(--term-fs-small);margin-top:2px}
+.folio-arrow{font-family:var(--term-mono);color:var(--term-ink-mute);transition:color .2s}
+.folio-row:hover .folio-arrow{color:var(--term-accent)}
+
+/* 技术带 */
+.techstrip{margin-top:104px;border-top:1px solid var(--term-line);border-bottom:1px solid var(--term-line);background:var(--term-bg-elev)}
+.techstrip__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 36px;padding:22px 0;font-size:var(--term-fs-small);color:var(--term-ink-dim)}
+.techstrip__row .mono{font-size:13px}
+
+/* CTA */
+.cta{margin:104px 0 0;padding:56px 48px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.cta h2{font-size:var(--term-fs-h2);line-height:1.2;margin-top:12px}
+.cta p{color:var(--term-ink-dim);margin-top:10px;max-width:36em}
+.cta-btns{display:flex;gap:12px;flex-wrap:wrap}
+
+/* 页脚 */
+.footer{margin-top:112px;border-top:1px solid var(--term-line)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding:48px 0}
+.footer .eyebrow{margin-bottom:14px}
+.footer p{color:var(--term-ink-dim);font-size:var(--term-fs-small);max-width:28em}
+.footer ul{list-style:none}
+.footer li{margin-bottom:8px}
+.footer li a{font-size:var(--term-fs-small);color:var(--term-ink-dim);transition:color .18s}
+.footer li a:hover{color:var(--term-accent)}
+.footer-bottom{border-top:1px solid var(--term-line);padding:20px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--term-mono);font-size:12px;color:var(--term-ink-mute)}
+
+/* 入场动画 */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero{padding:64px 0 48px}
+  .how-grid,.feat-grid{grid-template-columns:1fr 1fr}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .nav a:not(.btn){display:none}
+}
+@media(max-width:600px){
+  .container{padding:0 20px}
+  .how-grid,.feat-grid{grid-template-columns:1fr}
+  .folio-row{grid-template-columns:1fr auto;gap:12px}
+  .folio-year{display:none}
+  .cta{padding:40px 24px}
+  .footer-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 顶栏 ================= -->
+<header class="header">
+  <div class="container header__in">
+    <a class="brand" href="#top">MAODOU<span class="accent">.WORKS</span></a>
+    <nav class="nav">
+      <a href="#how">做法</a>
+      <a href="#work">精选项目</a>
+      <a href="#repos">全部仓库</a>
+      <a href="#contact">联系</a>
+      <a class="btn btn--primary" href="https://github.com/qiangsi" target="_blank" rel="noopener">GitHub @qiangsi</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ================= Hero ================= -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow"><span class="status-dot"></span>独立开发者 · 毛豆宇宙 · since 2013</span>
+        <h1 class="display">把想法做成<br>能玩的东西<span class="accent">。</span></h1>
+        <p class="lede">你好，我是苗豆。一个人运营整个「毛豆宇宙」：像素游戏、教育项目与自托管工具 —— 想到 → 做完 → 发布，画面、剧本、音效、打包全部自己动手。</p>
+        <div class="hero-cta">
+          <a class="btn btn--primary" href="#work">看精选项目</a>
+          <a class="btn" href="https://maodou-wangba.pinme.dev" target="_blank" rel="noopener">在线试玩《网吧，PLEASE》 ↗</a>
+        </div>
+        <span class="pill hero-pill"><span class="pill__dot"></span>status: 正在做毛豆系小游戏与教育项目</span>
+      </div>
+      <div class="win reveal in">
+        <div class="win__bar">
+          <span class="win__dots"><span class="win__dot"></span><span class="win__dot"></span><span class="win__dot--g win__dot"></span></span>
+          <span class="win__title">maodou@work: ~</span>
+        </div>
+        <div class="win__body">
+          <div><span class="prompt">$</span> <span class="cmd">whoami</span></div>
+          <div class="ok">苗豆 — 独立开发者 / 全栈手工党</div>
+          <div><span class="prompt">$</span> <span class="cmd">cat 信条.txt</span></div>
+          <div class="out">1. 想到 → 做完 → 发布</div>
+          <div class="out">2. 零依赖 · 零构建 · 单文件</div>
+          <div class="out">3. 美术音效代码生成，不买素材</div>
+          <div><span class="prompt">$</span> <span class="cmd">ls ~/maodou</span></div>
+          <div class="out"><span class="ok">网吧 PLEASE</span>  <span class="ok">毛豆深海</span>  口袋世界</div>
+          <div class="out">毛豆杯创作营  yobimessage  InvestDojo</div>
+          <div><span class="prompt">$</span> <span class="cmd">./launch --online</span></div>
+          <div class="ok">▶ maodou-wangba.pinme.dev  [已上线]</div>
+          <div><span class="prompt">$</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="hero-stats reveal">
+        <div><div class="num">2013</div><div class="lbl">开始写代码</div></div>
+        <div><div class="num">13</div><div class="lbl">公开仓库</div></div>
+        <div><div class="num">6+</div><div class="lbl">已上线可玩作品</div></div>
+        <div><div class="num">0</div><div class="lbl">第三方依赖</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 01 做法 ================= -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow"><span class="accent mono">01</span> 做法与信条</span>
+        <h2 class="display">想到 → 做完 → 发布<span class="accent">。</span></h2>
+      </div>
+      <div class="how-grid">
+        <div class="panel reveal">
+          <span class="step-num">01</span>
+          <h3 class="display">单文件哲学</h3>
+          <p>双击 index.html 就能跑。HTML + Canvas + WebAudio 手写实现，不引第三方库、不走构建流程，代码全部开源在 GitHub。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="step-num">02</span>
+          <h3 class="display">原创到底</h3>
+          <p>像素立绘用字符画网格逐格定义，音效全部由 WebAudio 程序合成，剧本自己写 —— 不买素材、不用占位图，作品里没有一行借来的美术。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="step-num">03</span>
+          <h3 class="display">一路发到端上</h3>
+          <p>网页版直接上线，安卓版用 GitHub Actions 云端打包签名 APK；Pages、pinme.dev、Render 多渠道部署，做完的东西一定能被玩到。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 精选项目 ================= -->
+  <section class="section" id="work">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow"><span class="accent mono">02</span> 精选项目</span>
+        <h2 class="display">一个人，一条完整的流水线<span class="accent">。</span></h2>
+      </div>
+      <div class="feat-grid">
+
+        <div class="panel reveal">
+          <div class="feat-top"><span class="step-num">01</span><span class="feat-tag">papers-please-like · canvas</span></div>
+          <h3 class="display">网吧，PLEASE</h3>
+          <p>Papers, Please 像素风小游戏：你是毛豆电竞网吧的夜班网管，查证件、找矛盾、盖公章，揪出拿家长身份证上网的小学生。约 3000 行纯前端代码，《孤勇者》接歌词测谎、X 光扫书包、六天连环剧本、双结局。</p>
+          <div class="feat-links">
+            <a class="more-link" href="https://maodou-wangba.pinme.dev" target="_blank" rel="noopener">在线试玩 ↗</a>
+            <a class="more-link" href="https://github.com/qiangsi/wangba-please" target="_blank" rel="noopener">源码</a>
+            <a class="more-link" href="https://github.com/qiangsi/wangba-place-android" target="_blank" rel="noopener">安卓版</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="feat-top"><span class="step-num">02</span><span class="feat-tag">fishing · 日漫风 · 双端</span></div>
+          <h3 class="display">毛豆深海</h3>
+          <p>热血日漫风深海钓鱼游戏：红头巾毛豆开着「毛豆丸」驶向修罗深渊。4 个深度区域、14 种稀有度分级生物、竿线饵三条升级路线与图鉴；美术与音效全部代码生成，网页 + 安卓 APK 双端发布。</p>
+          <div class="feat-links">
+            <a class="more-link" href="https://github.com/qiangsi/maodou-deep" target="_blank" rel="noopener">源码与下载 ↗</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="feat-top"><span class="step-num">03</span><span class="feat-tag">self-hosted · python · stdlib</span></div>
+          <h3 class="display">yobimessage</h3>
+          <p>自托管聊天式消息面板：在 Tailscale 内网里像微信一样按会话查看、直接回复 Yobiru 消息。单文件 Python 仅用标准库，双信箱合一、reply_to 链自动归组会话，只绑内网地址、不接触凭据的安全设计。</p>
+          <div class="feat-links">
+            <a class="more-link" href="https://github.com/qiangsi/yobimessage" target="_blank" rel="noopener">源码 ↗</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="feat-top"><span class="step-num">04</span><span class="feat-tag">fintech · paypal · ai-tutor</span></div>
+          <h3 class="display">InvestDojo</h3>
+          <p>付 $1 跟 AI 学一堂投资课的静态单页：PayPal SDK 沙箱支付解锁课程，OpenRouter 驱动 AI 助教先提问再讲解，超纲问题诚实说「这节还没讲到」；课后测验 + 本地学习记录，API Key 只存页面内存。</p>
+          <div class="feat-links">
+            <a class="more-link" href="https://github.com/qiangsi/InvestDojo" target="_blank" rel="noopener">源码 ↗</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="feat-top"><span class="step-num">05</span><span class="feat-tag">html5 game · node · multiplayer</span></div>
+          <h3 class="display">口袋世界 · 联机版</h3>
+          <p>单文件 HTML5 小游戏 + 零依赖 Node.js 联机服务器：服务器只用内置模块，一条命令起服，同网络设备即开即玩，可一键部署到 Render 公网联机。</p>
+          <div class="feat-links">
+            <a class="more-link" href="https://github.com/qiangsi/koudai-world" target="_blank" rel="noopener">源码 ↗</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="feat-top"><span class="step-num">06</span><span class="feat-tag">education · rubric · ethics</span></div>
+          <h3 class="display">毛豆杯 · AI 游戏创作营</h3>
+          <p>面向「暂时对课堂提不起劲」同学的校园 AI 游戏创作赛：完整教学设计 + 100 分过程性量规，不淘汰、不排名、去标签化，未成年人保护边界写进页面；配套教师备课库一并开源。</p>
+          <div class="feat-links">
+            <a class="more-link" href="https://qiangsi.github.io/maodou-cup-ai-game-camp/" target="_blank" rel="noopener">活动页 ↗</a>
+            <a class="more-link" href="https://github.com/qiangsi/school-refusal-children" target="_blank" rel="noopener">备课库</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 全部仓库 ================= -->
+  <section class="section" id="repos">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow"><span class="accent mono">03</span> 全部仓库</span>
+        <h2 class="display">每一个都做完并开源<span class="accent">。</span></h2>
+      </div>
+      <div class="folio reveal">
+        <a class="folio-row" href="https://github.com/qiangsi/wangba-please" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">网吧，PLEASE<span class="mono">wangba-please</span></span><span class="folio-desc" style="display:block">Papers, Please 像素风网吧检查小游戏 · Canvas + WebAudio 零依赖</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/wangba-place-android" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">网吧，PLEASE · 安卓版<span class="mono">wangba-place-android</span></span><span class="folio-desc" style="display:block">WebView 壳 · 离线内置资源 · GitHub Actions 自动打包签名 APK</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/maodou-deep" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">毛豆深海<span class="mono">maodou-deep</span></span><span class="folio-desc" style="display:block">热血日漫风深海钓鱼游戏 · 网页 + 安卓双端</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/maodou-game-atlas-android-test-builds" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">毛豆游戏百科<span class="mono">maodou-game-atlas-android-test-builds</span></span><span class="folio-desc" style="display:block">安卓测试版 APK 发布仓库</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/yobimessage" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">yobimessage<span class="mono">yobimessage</span></span><span class="folio-desc" style="display:block">自托管聊天式消息面板 · 单文件 Python · Tailscale 内网</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/InvestDojo" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">InvestDojo<span class="mono">InvestDojo</span></span><span class="folio-desc" style="display:block">$1 一节课的 AI 投资教育单页 · PayPal + OpenRouter</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/koudai-world" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">口袋世界 · 联机版<span class="mono">koudai-world</span></span><span class="folio-desc" style="display:block">单文件 HTML5 游戏 + 零依赖 Node.js 联机服务器</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/maodou-cup-ai-game-camp" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">毛豆杯 · AI 游戏创作营<span class="mono">maodou-cup-ai-game-camp</span></span><span class="folio-desc" style="display:block">校园 AI 游戏创作邀请赛活动页 · 像素风 logo 全代码绘制</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/school-refusal-children" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">AI 游戏创作营 · 教师备课库<span class="mono">school-refusal-children</span></span><span class="folio-desc" style="display:block">完整教学设计 + 100 分过程性评价量规 + 伦理边界</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/maodou-bookhouse" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">毛豆书屋<span class="mono">maodou-bookhouse</span></span><span class="folio-desc" style="display:block">官网 · 阅读、电影、写作与思辨的真诚交流空间</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://qiangsi.github.io/maodou-shufang/" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">毛豆书房<span class="mono">maodou-shufang</span></span><span class="folio-desc" style="display:block">官网 · 暗色极简单页站点</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/ai-startup-30day-plan" target="_blank" rel="noopener">
+          <span class="folio-year">2026</span>
+          <span><span class="folio-name">AI 创业 30 天验证计划<span class="mono">ai-startup-30day-plan</span></span><span class="folio-desc" style="display:block">首月创业验证跟踪页 · 清单/访谈提纲/决策门槛</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+        <a class="folio-row" href="https://github.com/qiangsi/Datapaihuanggua" target="_blank" rel="noopener">
+          <span class="folio-year">2022</span>
+          <span><span class="folio-name">Datapaihuanggua<span class="mono">Datapaihuanggua</span></span><span class="folio-desc" style="display:block">早期实验项目</span></span>
+          <span class="folio-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 技术带 ================= -->
+  <div class="techstrip reveal">
+    <div class="container techstrip__row mono">
+      <span>JavaScript</span><span>Canvas</span><span>WebAudio</span><span>HTML/CSS</span>
+      <span>Python</span><span>Node.js</span><span>Java / Android</span><span>Gradle</span>
+      <span>GitHub Actions</span><span>PayPal SDK</span><span>OpenRouter / LLM</span><span>systemd</span><span>Tailscale</span>
+    </div>
+  </div>
+
+  <!-- ================= CTA ================= -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="panel cta reveal">
+        <div>
+          <span class="eyebrow"><span class="status-dot"></span>open to collaborate</span>
+          <h2 class="display">有想一起做的？<br>来聊聊<span class="accent">。</span></h2>
+          <p>游戏、教育、自托管工具，或者任何「想到 → 做完 → 发布」的点子。所有项目代码全部开源，欢迎 Issue、Fork 与合作。</p>
+        </div>
+        <div class="cta-btns">
+          <a class="btn btn--primary" href="https://github.com/qiangsi" target="_blank" rel="noopener">GitHub @qiangsi</a>
+          <a class="btn" href="https://maodou-wangba.pinme.dev" target="_blank" rel="noopener">先玩个游戏 ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= 页脚 ================= -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <span class="eyebrow">MAODOU.WORKS</span>
+        <p>苗豆的毛豆宇宙：像素游戏、教育项目与自托管工具。零依赖、零构建、一定发布。</p>
+      </div>
+      <div>
+        <span class="eyebrow">链接</span>
+        <ul>
+          <li><a href="https://github.com/qiangsi" target="_blank" rel="noopener">GitHub @qiangsi</a></li>
+          <li><a href="https://maodou-wangba.pinme.dev" target="_blank" rel="noopener">网吧，PLEASE · 在线试玩</a></li>
+          <li><a href="https://qiangsi.github.io/maodou-cup-ai-game-camp/" target="_blank" rel="noopener">毛豆杯活动页</a></li>
+          <li><a href="https://qiangsi.github.io/maodou-shufang/" target="_blank" rel="noopener">毛豆书房</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="eyebrow">本页</span>
+        <ul>
+          <li><a href="#how">做法与信条</a></li>
+          <li><a href="#work">精选项目</a></li>
+          <li><a href="#repos">全部仓库</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 苗豆 MAODOU · built by hand</span>
+      <span>zero dependencies · single file · <span class="accent">v1.0.0</span></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// 滚动入场动画（带兜底：任何环境下 4 秒后全部显示，内容永远可见）
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  function revealAll(){ for (var i = 0; i < els.length; i++) els[i].classList.add('in'); }
+  if (!('IntersectionObserver' in window)) { revealAll(); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, {threshold: 0.08, rootMargin: '0px 0px -40px 0px'});
+  for (var i = 0; i < els.length; i++) io.observe(els[i]);
+  setTimeout(revealAll, 4000);
+})();
+</script>
+</body>
+</html>
