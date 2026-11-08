@@ -485,5 +485,18 @@ section{scroll-margin-top:76px}
   setTimeout(revealAll, 4000);
 })();
 </script>
+<!-- 访客统计 · MAODOU.STATS（IP 仅哈希，不存明文） -->
+<script>
+(function(){
+  try{
+    var p={path:location.pathname,ref:document.referrer||'',lang:(navigator.language||'').slice(0,32),tz:'',screen:screen.width+'x'+screen.height};
+    try{p.tz=(Intl.DateTimeFormat().resolvedOptions().timeZone||'').slice(0,48)}catch(e){}
+    var u='https://maodou-stats-29be.api.pinme.pro/api/collect';
+    var b=new Blob([JSON.stringify(p)],{type:'text/plain;charset=UTF-8'});
+    if(navigator.sendBeacon&&navigator.sendBeacon(u,b))return;
+    fetch(u,{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(p)}).catch(function(){});
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
